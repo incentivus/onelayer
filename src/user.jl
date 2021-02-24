@@ -1,6 +1,10 @@
+abstract type Debt end
+
+
 struct User
     assets::Dict{String, Asset}
-    User() = new(Dict())
+    debts::Array{Debt, 1}
+    User() = new(Dict(), [])
 end
 
 import Base: +, -

@@ -7,24 +7,24 @@ end
 function -(a1::Asset, a2::Asset) 
     throw(DomainError(typeof(a2), "Argument types missmatch: $(typeof(a1)) + $(typeof(a2))"))
 end
-function *(a::T, m::Int64) where T <: Asset
+function *(a::T, m::Number) where T <: Asset
     T(a.value*m)
 end
-function *(m::Int64, a::T) where T <: Asset
+function *(m::Number, a::T) where T <: Asset
     T(a.value*m)
 end
 struct DAI <: Asset
     symbol::String
-    precision::Int64
-    value::Int64
-    DAI(v::Int64) = new("DAI", 0, v)
+    precision::Number
+    value::Number
+    DAI(v::Number) = new("DAI", 0, v)
 end
 
 struct ETH <: Asset
     symbol::String
-    precision::Int64
-    value::Int64
-    ETH(v::Int64) = new("ETH", 0, v)
+    precision::Number
+    value::Number
+    ETH(v::Number) = new("ETH", 0, v)
 end
 
 function +(a1::T, a2::T) where T <: Asset 
@@ -32,7 +32,7 @@ function +(a1::T, a2::T) where T <: Asset
 end
 
 function -(a1::T, a2::T) where T <: Asset
-     T(a1.value + a2.value)
+     T(a1.value - a2.value)
 end
 
 # 
