@@ -1,6 +1,23 @@
-abstract type aToken <: Asset end
+# abstract type aToken <: Asset end
+# Test
 
-struct Pool
+
+struct aToken{S, P} <: Currency
+    function aToken{S, P}() where {S, P}
+        haskey(_atoken_data, S) || error("aToken $S is not defined.")
+        new{S, P}()
+    end
+end
+
+const _atoken_data = Dict(
+        :aDAI  => (aToken{:DAI},  :DAI, RegularCurrency{:DAI}),
+        :aAAVE => (aToken{:AAVE}, :AAVE, RegularCurrency{:AAVE}))
+
+for x in keys(_atoken_data)
+    Meta.parse("$x = Asset{aToken{:$x, _atoken_data[:$x][2] }}()") |> eval
+end
+
+struct Pool{USDT}
     asset::Asset
     marketSize::Int128
     totalBorrowed::Int128
@@ -9,39 +26,7 @@ struct Pool
     stableBorrowAPR::Float64
 end
 
-struct aDAI <: aToken
-    underlyingAsset::DAI
-    function aDAI(value::Number)
-        new(DAI(value))
-    end
-end
-
-struct aETH <: aToken
-    underlyingAsset::ETH
-    function aETH(value::Number)
-        new(ETH(value))
-    end
-end
-
-
-import Base: +, -, *
-
-function +(a1::T, a2::T) where T <: aToken
-    T(a1.underlyingAsset.value + a2.underlyingAsset.value)
-end
-
-function -(a1::T, a2::T) where T <: aToken
-    T(a1.underlyingAsset.value - a2.underlyingAsset.value)
-end
-
-function *(a::T, m::Number) where T <: aToken
-    T(a.underlyingAsset.value*m)
-end
-
-function *(m::Number, a::T) where T <: aToken
-    T(a.underlyingAsset.value*m)
-end
-
+depositAPY(::Type{Pool{T}})
 
 struct AaveDebt <: Debt
     borrowedAssets::Array{Asset, 1}
@@ -73,7 +58,7 @@ function swap(proto::Aave, src::DAI, dst::Type{T}, ::Type{StableRate}, user::Use
 function swap(proto::Aave, src::DAI, dst::Type{T}, ::Type{VariableRate}, user::User) where T <: Asset end
 
 
-
+swap(a::Asset{RegularCurrency{S}}, ::Type{Asset{aToken{P, S}}}) where {S, P} =  Asset{aToken{P, S}}(a.balance)
 
 
 
