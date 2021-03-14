@@ -1,44 +1,43 @@
-import Base: +, -, *
+abstract type Currency end
 
-abstract type Asset end
-function +(a1::Asset, a2::Asset) 
-    throw(DomainError(typeof(a2), "Argument types missmatch: $(typeof(a1)) + $(typeof(a2))"))
-end
-function -(a1::Asset, a2::Asset) 
-    throw(DomainError(typeof(a2), "Argument types missmatch: $(typeof(a1)) + $(typeof(a2))"))
-end
-function *(a::T, m::Number) where T <: Asset
-    T(a.value*m)
-end
-function *(m::Number, a::T) where T <: Asset
-    T(a.value*m)
-end
-struct DAI <: Asset
-    symbol::String
-    precision::Number
-    value::Number
-    DAI(v::Number) = new("DAI", 0, v)
+struct Asset{C}
+    balance::Number
+    function Asset{C}(a::Number) where C <: Currency
+        C()
+        new{C}(a)
+    end
 end
 
-struct ETH <: Asset
-    symbol::String
-    precision::Number
-    value::Number
-    ETH(v::Number) = new("ETH", 0, v)
+
+struct RegularCurrency{S} <: Currency
+    function RegularCurrency{S}() where {S}
+        haskey(_regular_data, S) || error("Regular currency $S is not defined.")
+        new{S}()
+    end
 end
 
-function +(a1::T, a2::T) where T <: Asset 
-     T(a1.value + a2.value)
+const _regular_data = Dict(
+	:DAI  => (RegularCurrency{:DAI},  18),
+	:AAVE => (RegularCurrency{:AAVE}, 18))
+
+
+
+# TODO add support for rounding upto precision/decimal of each currency
+
+
+import Base.+, Base.*, Base.-, Base./
+
+*(a::Number, b::Asset{T}) where {T} = Asset{T}(a*b.balance)
+*(a::Asset{T}, b::Number) where {T} = Asset{T}(b*a.balance)
+/(a::Asset{T}, b::Number) where {T} = Asset{T}(a.balance/b)
++(a::Asset{T}, b::Asset{T}) where {T} = Asset{T}(a.balance+b.balance)
+
+Asset{T}() where {T} = Asset{T}(1)
+
+
+for k in keys(_regular_data)
+    Meta.parse("$k = Asset{RegularCurrency{:$k}}()") |> eval
 end
 
-function -(a1::T, a2::T) where T <: Asset
-     T(a1.value - a2.value)
-end
 
-# 
-# a1 = DAI(10)
-# a2 = DAI(30)
-# 
-# e1 = ETH(10)
-# println(a1+e1)
 
