@@ -21,7 +21,6 @@ Debt
 
 
 
-abstract type Protocol end
 
 include("currencies.jl")
 include("user.jl")

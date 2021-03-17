@@ -20,7 +20,10 @@ const _regular_data = Dict(
 	:DAI  => (RegularCurrency{:DAI},  18),
 	:AAVE => (RegularCurrency{:AAVE}, 18))
 
+symbol(a::Asset{C}) = symbol(C)
+symbol(Type{RegularCurrency{T}}) where {T} = T
 
+unify(a::Asset{T}) where {T} = Asset{T}(1)
 
 # TODO add support for rounding upto precision/decimal of each currency
 
