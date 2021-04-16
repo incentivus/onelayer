@@ -3,6 +3,7 @@ struct Solver
     constraints::Array{Convex.Constraint, 1}
     swaps::Array{Swap, 1}
     tokens::Dict{Symbol, Int64}
+    protocols::Array{Protocol, 1}
 end
 
 
@@ -17,7 +18,7 @@ function registerTokens(s::Solver, tokens::Array{Symbol, 1})
     end
 
 function buildAMatrix(s::Solver)
-    A = zeros(tokens.count, length(s.swaps))
+    A = zeros(s.tokens.count, length(s.swaps))
     for i in length(s.swaps)
         swap = s.swaps[i]
         for asset in assets(swap)
@@ -35,18 +36,29 @@ function solve(s::Solver)
     # TODO Solve the problem here
 
 
-function newSolver(protocols::Array{Protocol, 1})
+function newSolver(protocols::Array{Protocol, 1}, steps::Int64)
     variableSize = sum(length.(getSwaps.(protocols)))
-    x = Variable(variableSize)
+    X = []
+    for i in 1:steps
+        x = Variable(variableSize)
+        push!(X, x)
+    end
     constraints = []::Array{Convex.Constraint, 1}
     swaps = []::Array{Swap, 1}
 
     i = 1
     for p in protocols
+        for j in 1:steps
+        var = X[j][i]
         for s in getSwaps(p):
-            setVariable!(s, x[i])
+            addVariable!(s, var)
             i += 1
         append!(constraints, getConstraints(p))
         append!(swaps, getSwaps(p))
     end
-    Solver(x, constraints, swaps)
+    Solver(x, constraints, swaps, protocols)
+
+function updateProtocols(s::Solver)
+    for p in s.protocols
+        update(p)
+    end

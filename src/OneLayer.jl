@@ -25,4 +25,5 @@ Debt
 include("currencies.jl")
 include("user.jl")
 include("aave.jl")
+println("What?!")
 end

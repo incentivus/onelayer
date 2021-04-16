@@ -24,6 +24,7 @@ symbol(a::Asset{C}) = symbol(C)
 symbol(Type{RegularCurrency{T}}) where {T} = T
 
 unify(a::Asset{T}) where {T} = Asset{T}(1)
+balance(a::Asset{T}) where {T} = a.balance
 
 # TODO add support for rounding upto precision/decimal of each currency
 
