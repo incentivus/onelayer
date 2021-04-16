@@ -26,7 +26,7 @@ struct Pool{USDT}
     stableBorrowAPR::Float64
 end
 
-depositAPY(::Type{Pool{T}})
+# depositAPY(::Type{Pool{T}})
 
 struct AaveDebt <: Debt
     borrowedAssets::Array{Asset, 1}
