@@ -1,29 +1,34 @@
 module OneLayer
 
-# Write your package code here.
+import Convex: Variable, Constraint, AbstractExpr
 
+# Write your package code here.
+abstract type Protocol end
 export 
 DAI, 
-ETH,
+AAVE,
 Asset,
-Aave,
-swap,
-RateModel,
-StableRate, 
-VariableRate,
-User,
-AaveDebt,
+# Aave,
+# swap,
+# RateModel,
+# StableRate, 
+# VariableRate,
+# User,
+# AaveDebt,
 aDAI,
-aETH,
-aToken,
-Debt
+aAAVE,
+aToken
+# Debt
 
 
 
 
 
 include("currencies.jl")
-include("user.jl")
-include("aave.jl")
+include("swap.jl")
+include("solver.jl")
+include("cpmm.jl")
+# include("user.jl")
+# include("aave.jl")
 println("What?!")
 end

@@ -20,8 +20,8 @@ const _regular_data = Dict(
 	:DAI  => (RegularCurrency{:DAI},  18),
 	:AAVE => (RegularCurrency{:AAVE}, 18))
 
-symbol(a::Asset{C}) = symbol(C)
-symbol(Type{RegularCurrency{T}}) where {T} = T
+symbol(a::Asset{C}) where {C} = symbol(C)
+symbol(t::Type{RegularCurrency{T}}) where {T} = T
 
 unify(a::Asset{T}) where {T} = Asset{T}(1)
 balance(a::Asset{T}) where {T} = a.balance
