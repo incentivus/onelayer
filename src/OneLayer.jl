@@ -1,6 +1,7 @@
 module OneLayer
 
-import Convex: Variable, Constraint, AbstractExpr
+import Convex: Variable, Constraint, AbstractExpr, maximize
+import Convex
 
 # Write your package code here.
 abstract type Protocol end
@@ -30,5 +31,5 @@ include("solver.jl")
 include("cpmm.jl")
 # include("user.jl")
 # include("aave.jl")
-println("What?!")
+println("How?!")
 end

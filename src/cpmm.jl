@@ -22,17 +22,17 @@ end
 
 function fillPositions(cp::ConstantProduct)
     for r in cp.reserves
-        s1 = Swap(unify(r.first), nothing)
+        s1 = Swap(-1*unify(r.first), nothing)
         s2 = Swap(unify(r.second), nothing)
         sp = SwapPosition(r, s1, s2)
         push!(r.positions, sp)
         push!(cp.positions, sp)
 
-        s1 = Swap(unify(r.second), nothing)
-        s2 = Swap(unify(r.first), nothing)
-        sp = SwapPosition(r, s1, s2)
-        push!(r.positions, sp)
-        push!(cp.positions, sp)
+        # s1 = Swap(-1*unify(r.second), nothing)
+        # s2 = Swap(unify(r.first), nothing)
+        # sp = SwapPosition(r, s1, s2)
+        # push!(r.positions, sp)
+        # push!(cp.positions, sp)
     end
 end
 
@@ -42,7 +42,7 @@ function ConstantProduct(pairs::Array{<:Tuple{Asset, Asset}, 1}, fee::Float64)
     for p in pairs
         first = unify(p[1])
         second = unify(p[2])
-        push!(reserves, Reserve(first, second, Array{SwapPosition, 1}()))
+        push!(reserves, Reserve(first*100, second*100, Array{SwapPosition, 1}()))
     end
     
     cp = ConstantProduct(reserves, [], fee)
@@ -60,7 +60,7 @@ function update(cp::ConstantProduct)
 end
 
 function swapNumbers(cp::ConstantProduct)
-    length(cp.reserves)*4
+    length(cp.positions)*2
 end
 
 function getSwaps(cp::ConstantProduct)
@@ -74,26 +74,26 @@ end
 
 function getConstraints(cp::ConstantProduct)
     constraints = []
-    for r in getReserves(cp)
-        steps = length(r.positions[1].src.variables)
-        if steps <= 1
-            break
-        end
-        # push!(constraints, r.positions[1].src.variables[1] >= 0, r.positions[1].dst.variables[1] >= 0, r.positions[2].src.variables[1] >= 0, r.positions[2].dst.variables[1] >= 0)
-        # cons = [r.positions[1].src.variables[1], r.positions[2].dst.variables[1]]
-        for i in 1:steps
-            x0 = r.positions[1].src.variables[i]
-            x1 = r.positions[1].dst.variables[i]
-            x2 = r.positions[2].src.variables[i]
-            x3 = r.positions[2].dst.variables[i]
+    # for r in getReserves(cp)
+    #     steps = length(r.positions[1].src.variables)
+    #     if steps <= 1
+    #         break
+    #     end
+    #     # push!(constraints, r.positions[1].src.variables[1] >= 0, r.positions[1].dst.variables[1] >= 0, r.positions[2].src.variables[1] >= 0, r.positions[2].dst.variables[1] >= 0)
+    #     # cons = [r.positions[1].src.variables[1], r.positions[2].dst.variables[1]]
+    #     for i in 1:steps
+    #         x0 = r.positions[1].src.variables[i]
+    #         x1 = r.positions[1].dst.variables[i]
+    #         x2 = r.positions[2].src.variables[i]
+    #         x3 = r.positions[2].dst.variables[i]
 
-            push!(cons, x0, x3)
+    #         push!(cons, x0, x3)
 
-            # r.first[i] = r.first[i-1] - x0 + x3
-            # r.second[i] = r.second[i-1] + x1 - x2
-        end
-        push!(constraints, sum(cons) <= maximum(cons))
-    end
+    #         # r.first[i] = r.first[i-1] - x0 + x3
+    #         # r.second[i] = r.second[i-1] + x1 - x2
+    #     end
+    #     push!(constraints, sum(cons) <= maximum(cons))
+    # end
     for p in getPositions(cp)
         for i in 1:length(p.src.variables)
             r1 = getBalance(p.reserve, p.src.assets[1])
@@ -102,7 +102,7 @@ function getConstraints(cp::ConstantProduct)
             x = p.src.variables[i]
             y = p.dst.variables[i]
             k = r1*r2
-            push!(constraints, k/(r1+x*(1-cp.fee)) - (r2 - y) <= 0, x >= 0, y >= 0)
+            push!(constraints, k/(r1+x*(1-cp.fee)) - (r2 - y) <= 0, x >= 0, y >= 0, y <= r2)
         end
     end
     return constraints
