@@ -65,7 +65,7 @@ function solve(s::Solver)
     #     balance[:, i] = balance[:, i-1] + A*X[i]
     #     push!(s.constraints, balance[:, i] >= 0)
     # end
-    
+    push!(s.constraints, balance[:, s.steps] + A*X[s.steps] >= 0)
     problem = maximize(transpose(C)*(balance[:, s.steps] + A*X[s.steps]), s.constraints)
     return problem
     # solve!(problem, ECOS.Optimizer

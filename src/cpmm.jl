@@ -42,7 +42,7 @@ function ConstantProduct(pairs::Array{<:Tuple{Asset, Asset}, 1}, fee::Float64)
     for p in pairs
         first = unify(p[1])
         second = unify(p[2])
-        push!(reserves, Reserve(first*100, second*100, Array{SwapPosition, 1}()))
+        push!(reserves, Reserve(first*10000, second*100, Array{SwapPosition, 1}()))
     end
     
     cp = ConstantProduct(reserves, [], fee)
@@ -102,7 +102,7 @@ function getConstraints(cp::ConstantProduct)
             x = p.src.variables[i]
             y = p.dst.variables[i]
             k = r1*r2
-            push!(constraints, k/(r1+x*(1-cp.fee)) - (r2 - y) <= 0, x >= 0, y >= 0, y <= r2)
+            push!(constraints, r2/(1+x*(1-cp.fee)/r1) - (r2 - y) <= 0, x >= 0, y >= 0, y <= r2)
         end
     end
     return constraints
