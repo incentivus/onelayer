@@ -19,8 +19,12 @@ end
 const _regular_data = Dict(
 	:DAI  => (RegularCurrency{:DAI},  18),
 	:AAVE => (RegularCurrency{:AAVE}, 18),
-        :BUSD => (RegularCurrency{:BUSD}, 18))
+        :BUSD => (RegularCurrency{:BUSD}, 18),
+	:BTCST => (RegularCurrency{:BUSD}, 17),
+	:WBNB => (RegularCurrency{:BUSD}, 18),
+	:CAKE => (RegularCurrency{:BUSD}, 18))
 
+decimal(a::Asset{C}) where {C <: RegularCurrency} = _regular_data[symbol(a)][2] 
 symbol(a::Asset{C}) where {C} = symbol(C)
 symbol(t::Type{RegularCurrency{T}}) where {T} = T
 

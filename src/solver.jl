@@ -42,24 +42,20 @@ function buildXMatrix(s::Solver)
     s.variables
 end
 
-function buildCMatrix(s::Solver)
-    target_symbol = :DAI
+function buildCMatrix(s::Solver, target::Symbol)
 
     C = zeros(s.tokens.count)
-    C[s.tokens[target_symbol]] = 1
+    C[s.tokens[target]] = 1
     return C
 end
 
-function solve(s::Solver)
+function solve(s::Solver, first::Symbol, init_amount::Float64, target::Symbol)
     A = buildAMatrix(s)
     X = buildXMatrix(s)
-    C = buildCMatrix(s)
-
-    init_amount = 1000
-    first_symbol = :BUSD
+    C = buildCMatrix(s, target)
 
     balance = zeros(s.tokens.count, s.steps)
-    balance[s.tokens[first_symbol], 1] = init_amount
+    balance[s.tokens[first], 1] = init_amount
 
     # for i in 1:s.steps-1
     #     balance[:, i] = balance[:, i-1] + A*X[i]

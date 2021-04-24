@@ -2,6 +2,7 @@ module OneLayer
 
 import Convex: Variable, Constraint, AbstractExpr, maximize
 import Convex
+using PyCall
 
 # Write your package code here.
 abstract type Protocol end
@@ -23,7 +24,7 @@ aToken
 
 
 
-
+pushfirst!(PyVector(pyimport("sys")["path"]), "")
 
 include("currencies.jl")
 include("swap.jl")
